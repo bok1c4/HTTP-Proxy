@@ -3,6 +3,7 @@
 // based on the request we need to process the response
 
 #include "http_server.cpp"
+#include "http_sockets.cpp"
 
 // maybe we should have the construct the socket
 // then we return the serverSocket file description
@@ -10,7 +11,11 @@
 
 int main(int argc, char *argv[]) {
   HttpServer http_server;
-  http_server.runServer();
+  HttpSocket http_server_socket;
+
+  int server_socket = http_server_socket.createServerSocket();
+
+  http_server.runServer(server_socket);
 
   return 0;
 }

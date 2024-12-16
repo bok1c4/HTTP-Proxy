@@ -8,11 +8,11 @@ BIN_DIR = bin
 CONTENT_DIR = content
 
 # Source and object files
-SRCS = $(SRC_DIR)/server.cpp $(SRC_DIR)/http_server.cpp
+SRCS = $(SRC_DIR)/main.cpp $(SRC_DIR)/http_server.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Target binary
-TARGET = $(BIN_DIR)/server
+TARGET = $(BIN_DIR)/main
 
 # Default rule (build everything)
 all: build

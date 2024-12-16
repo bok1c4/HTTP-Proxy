@@ -8,33 +8,19 @@
 
 class HttpServer {
 public:
-  int runServer() {
-    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+  void runServer(int serverSocket);
+};
 
-    sockaddr_in serverAddress;
-    serverAddress.sin_family = AF_INET; // ipv4
-    serverAddress.sin_port = htons(8080);
-    serverAddress.sin_addr.s_addr = INADDR_ANY;
+void runServer(int serverSocket) {
+  if (serverSocket != 0) {
+    std::cout << "Server socket should be null but it is: " << serverSocket;
+    throw("Invalid socket fd value for listening on");
+  }
 
-    int binded_value = bind(serverSocket, (struct sockaddr *)&serverAddress,
-                            sizeof(serverAddress));
+  int listen_value = listen(serverSocket, 5);
 
-    if (binded_value != 0) {
-      std::cout << "Bind value: " << binded_value;
-      throw("Socket not binded properly");
-
-      return -1;
-    }
-
-    int listen_value = listen(serverSocket, 5);
-
-    if (listen_value) {
-      std::cout << "Listen value: " << listen_value;
-      throw("Server failed at listening");
-
-      return -1;
-    }
-
-    return serverSocket;
-  };
+  if (listen_value) {
+    std::cout << "Listen value: " << listen_value;
+    throw("Server failed at listening");
+  }
 };
