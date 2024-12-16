@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = clang++
-CFLAGS = -Wall -Wextra -g -std=c++17
+CFLAGS = -Wall -Wextra -g -std=c++17 -I./header
 
 # Directories
 SRC_DIR = .
@@ -8,7 +8,7 @@ BIN_DIR = bin
 CONTENT_DIR = content
 
 # Source and object files
-SRCS = $(SRC_DIR)/main.cpp $(SRC_DIR)/http_server.cpp
+SRCS = $(SRC_DIR)/main.cpp $(SRC_DIR)/http_server.cpp $(SRC_DIR)/http_sockets.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Target binary
