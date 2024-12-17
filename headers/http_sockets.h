@@ -9,6 +9,7 @@
 class HttpSocket {
 public:
   int createServerSocket();
+  int createProxySocket(std::string ipaddr, int port);
 };
 
 #endif

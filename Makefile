@@ -1,14 +1,19 @@
 # Compiler and flags
 CC = clang++
-CFLAGS = -Wall -Wextra -g -std=c++17 -I./header
+CFLAGS = -Wall -Wextra -g -std=c++17 -I./headers
 
 # Directories
 SRC_DIR = .
+PROXY_DIR = proxy
 BIN_DIR = bin
 CONTENT_DIR = content
 
 # Source and object files
-SRCS = $(SRC_DIR)/main.cpp $(SRC_DIR)/http_server.cpp $(SRC_DIR)/http_sockets.cpp
+SRCS = $(SRC_DIR)/main.cpp \
+       $(SRC_DIR)/http_server.cpp \
+       $(SRC_DIR)/http_sockets.cpp \
+       $(PROXY_DIR)/proxy.cpp
+
 OBJS = $(SRCS:.cpp=.o)
 
 # Target binary
@@ -32,13 +37,17 @@ $(TARGET): $(OBJS) | $(BIN_DIR)
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Debug with clang++ debug flags
-debug: $(TARGET)
-	$(CC) --debug -o $(TARGET) $(OBJS)
-	echo "Server and client built with debug symbols."
+# Debug build with debug symbols
+debug: CFLAGS += -DDEBUG
+debug: clean build
+	@echo "Debug build complete with debug flags."
 
 # Clean all build artifacts
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS)
+	rm -f $(TARGET)
 	rm -rf $(BIN_DIR)
+
+# Phony targets
+.PHONY: all build clean debug
 

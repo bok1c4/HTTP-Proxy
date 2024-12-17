@@ -10,11 +10,11 @@
 
 void HttpServer::runServer(int serverSocket) {
   if (serverSocket == -1) {
-    std::cerr << "Invalid socket file descriptor!" << std::endl;
-    throw std::runtime_error("Invalid socket fd for listening");
+    std::cerr << "Invalid HTTP socket file descriptor!" << std::endl;
+    throw std::runtime_error("Invalid HTTP socket fd for listening");
   }
 
-  std::cout << "Server is running and listening on port..." << std::endl;
+  std::cout << "HTTP Server is running and listening on port..." << std::endl;
 
   while (true) {
     sockaddr_in client_address;
@@ -23,22 +23,19 @@ void HttpServer::runServer(int serverSocket) {
     int client_socket =
         accept(serverSocket, (struct sockaddr *)&client_address, &client_len);
     if (client_socket == -1) {
-      std::cerr << "Failed to accept client connection" << std::endl;
+      std::cerr << "HTTP Server: Failed to accept proxy connection"
+                << std::endl;
       continue;
     }
 
-    std::cout << "Client connected!" << std::endl;
+    std::cout << "HTTP Server: Proxy connected!" << std::endl;
 
-    // getting the request
-    // 1. create the request buffer
-    // 2. read the bytes with recv()
-    // 3. extract necessary info
     char requestBuffer[4096];
     int bytesRead =
         recv(client_socket, requestBuffer, sizeof(requestBuffer) - 1, 0);
 
     if (bytesRead < 0) {
-      std::cerr << "Failed to read client request" << std::endl;
+      std::cerr << "HTTP Server: Failed to read proxy request" << std::endl;
       close(client_socket);
       continue;
     }
@@ -58,7 +55,6 @@ void HttpServer::runServer(int serverSocket) {
       requestedPath = request.substr(start, end - start);
     }
 
-    // project path
     std::string projectPath = "/home/bok1c4/Projects/Web-Service/content/";
     std::string file = "";
 

@@ -1,19 +1,30 @@
 #include "./headers/http_server.h"
 #include "./headers/http_sockets.h"
+#include "./headers/proxy_server.h"
 #include <iostream>
 #include <stdexcept>
-
-// http should serve different html routes
-// /form - should server some kind of form and to creaet some kind of form post
+#include <thread>
 
 int main(int argc, char *argv[]) {
   try {
     HttpServer http_server;
-    HttpSocket http_server_socket;
+    HttpSocket sockets;
 
-    int server_socket = http_server_socket.createServerSocket();
+    // HTTP Server
+    int server_socket = sockets.createServerSocket();
 
-    http_server.runServer(server_socket);
+    // Run HTTP server on a separate thread
+    std::thread httpThread([&]() { http_server.runServer(server_socket); });
+
+    // Proxy Server
+    ProxyServer proxy_server("127.0.0.1", 8080); // HTTP server IP and port
+    int proxy_socket = sockets.createProxySocket("127.0.0.1", 3128);
+
+    // Start Proxy Server
+    proxy_server.Start(proxy_socket);
+
+    // Join threads (wait for HTTP server)
+    httpThread.join();
 
   } catch (const std::runtime_error &e) {
     std::cerr << "Error: " << e.what() << std::endl;
@@ -22,3 +33,4 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
+
