@@ -3,6 +3,9 @@
 #include <iostream>
 #include <stdexcept>
 
+// http should serve different html routes
+// /form - should server some kind of form and to creaet some kind of form post
+
 int main(int argc, char *argv[]) {
   try {
     HttpServer http_server;
