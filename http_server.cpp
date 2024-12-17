@@ -29,9 +29,53 @@ void HttpServer::runServer(int serverSocket) {
 
     std::cout << "Client connected!" << std::endl;
 
+    // getting the request
+    // 1. create the request buffer
+    // 2. read the bytes with recv()
+    // 3. extract necessary info
+    char requestBuffer[4096];
+    int bytesRead =
+        recv(client_socket, requestBuffer, sizeof(requestBuffer) - 1, 0);
+
+    if (bytesRead < 0) {
+      std::cerr << "Failed to read client request" << std::endl;
+      close(client_socket);
+      continue;
+    }
+
+    requestBuffer[bytesRead] = '\0';
+
+    std::string request(requestBuffer);
+    std::string requestedPath = "/";
+
+    std::cout << request;
+
+    size_t pos = request.find("GET ");
+
+    if (pos != std::string::npos) {
+      size_t start = pos + 4;
+      size_t end = request.find(" ", start);
+      requestedPath = request.substr(start, end - start);
+    }
+
+    // project path
+    std::string projectPath = "/home/bok1c4/Projects/Web-Service/content/";
+    std::string file = "";
+
+    if (requestedPath == "/") {
+      file = "index.html";
+    } else if (requestedPath == "/about") {
+      file = "about.html";
+    } else if (requestedPath == "/contact") {
+      file = "contact.html";
+    } else {
+      file = "404.html";
+    }
+
+    projectPath += file;
+
     // Read the custom HTML file
-    std::ifstream htmlFile(
-        "/home/bok1c4/Projects/Web-Service/content/index.html");
+    std::ifstream htmlFile(projectPath);
     if (!htmlFile.is_open()) {
       std::cerr << "Failed to open HTML file!" << std::endl;
       close(client_socket);
