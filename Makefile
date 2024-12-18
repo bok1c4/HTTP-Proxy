@@ -12,6 +12,7 @@ CONTENT_DIR = content
 SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/http_server.cpp \
        $(SRC_DIR)/http_sockets.cpp \
+       $(SRC_DIR)/utils.cpp \
        $(PROXY_DIR)/proxy.cpp
 
 OBJS = $(SRCS:.cpp=.o)

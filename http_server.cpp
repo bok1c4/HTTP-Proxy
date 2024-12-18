@@ -45,7 +45,7 @@ void HttpServer::runServer(int serverSocket) {
     std::string request(requestBuffer);
     std::string requestedPath = "/";
 
-    std::cout << request;
+    // std::cout << request;
 
     size_t pos = request.find("GET ");
 

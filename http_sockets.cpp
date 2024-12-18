@@ -58,7 +58,8 @@ int HttpSocket::createProxySocket(std::string ipaddr, int port) {
   int binded_value = bind(serverSocket, (struct sockaddr *)&serverAddress,
                           sizeof(serverAddress));
   if (binded_value != 0) {
-    std::cerr << "Bind error, binded value: " << binded_value << std::endl;
+    std::cerr << "Bind error, binded value: " << binded_value
+              << "port: " << port << std::endl;
     throw std::runtime_error("Socket binding failed");
   }
 

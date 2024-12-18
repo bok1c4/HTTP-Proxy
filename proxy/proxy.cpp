@@ -5,8 +5,15 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-ProxyServer::ProxyServer(std::string httpServerIP, int httpServerPort)
-    : httpServerIP(httpServerIP), httpServerPort(httpServerPort) {}
+ProxyServer::ProxyServer() {}
+
+// setters
+void ProxyServer::setPointToIp(std::string ip) { this->httpServerIP = ip; }
+void ProxyServer::setPointToPort(int port) { this->httpServerPort = port; }
+
+// getters
+std::string ProxyServer::getPointedToIp() { return this->httpServerIP; }
+int ProxyServer::getPointedToPort() { return this->httpServerPort; }
 
 void ProxyServer::Start(int proxy_socket) {
   if (proxy_socket == -1) {
@@ -30,7 +37,6 @@ void ProxyServer::Start(int proxy_socket) {
 
     std::cout << "PROXY Server: Client connected!" << std::endl;
 
-    // Handle the connection
     HandleConnection(client_socket);
 
     close(client_socket);
@@ -38,7 +44,6 @@ void ProxyServer::Start(int proxy_socket) {
 }
 
 void ProxyServer::HandleConnection(int clientSocket) {
-  // 1. Connect to the backend HTTP server
   int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
   if (serverSocket == -1) {
     std::cerr << "Failed to create server socket!" << std::endl;
@@ -50,35 +55,33 @@ void ProxyServer::HandleConnection(int clientSocket) {
   serverAddress.sin_port = htons(httpServerPort);
   inet_pton(AF_INET, httpServerIP.c_str(), &serverAddress.sin_addr);
 
+  std::cout << "[Proxy] Connecting to backend server " << httpServerIP
+            << " on port " << httpServerPort << std::endl;
+
   if (connect(serverSocket, (struct sockaddr *)&serverAddress,
               sizeof(serverAddress)) == -1) {
-    std::cerr << "Failed to connect to HTTP server!" << std::endl;
+    std::cerr << "[Proxy] Failed to connect to backend server!" << std::endl;
     close(serverSocket);
     return;
   }
 
-  // 2. Forward client request to HTTP server
   char buffer[4096];
+
+  // Forward client request to server
   int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
   if (bytesRead > 0) {
-    buffer[bytesRead] = '\0'; // Null-terminate the request
-    std::cout << "Proxy received request:\n" << buffer << std::endl;
-
-    // Send the request to the HTTP server
+    buffer[bytesRead] = '\0';
+    // std::cout << "[Proxy] Request received: " << buffer << std::endl;
     send(serverSocket, buffer, bytesRead, 0);
   }
 
-  // 3. Forward HTTP server response back to client
+  // Forward server response to client
   bytesRead = recv(serverSocket, buffer, sizeof(buffer) - 1, 0);
   if (bytesRead > 0) {
-    buffer[bytesRead] = '\0'; // Null-terminate the response
-    std::cout << "Proxy received response:\n" << buffer << std::endl;
-
-    // Send the response to the client
+    buffer[bytesRead] = '\0';
+    // std::cout << "[Proxy] Response received: " << buffer << std::endl;
     send(clientSocket, buffer, bytesRead, 0);
   }
 
-  // Close the connection to the server
   close(serverSocket);
 }
-

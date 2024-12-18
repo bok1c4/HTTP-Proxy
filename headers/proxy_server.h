@@ -7,8 +7,12 @@
 
 class ProxyServer {
 public:
-  ProxyServer(std::string httpServerIP, int httpServerPort);
+  ProxyServer();
   void Start(int proxySocket);
+  void setPointToIp(std::string httpServerIP);
+  void setPointToPort(int httpServerPort);
+  std::string getPointedToIp();
+  int getPointedToPort();
 
 private:
   void HandleConnection(int clientSocket);
@@ -17,4 +21,3 @@ private:
 };
 
 #endif
-

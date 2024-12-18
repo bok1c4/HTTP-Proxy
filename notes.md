@@ -39,7 +39,7 @@
 **Goal:** Extend the single-hop proxy to create a multi-hop chain (e.g., Proxy A → Proxy B → Destination).
 
 Build your own Multi-Hop proxy.
-Build and start multiple proxies, and route the trafiic between them for every client request.
+Build and start multiple proxies, and route the traffic between them for every client request.
 Also we need to have the encryption to have same behaviour as in Tor Network.
 
 - **What to Learn:**
