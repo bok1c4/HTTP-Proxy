@@ -46,6 +46,9 @@ int main(int argc, char *argv[]) {
       int port = ports.front();
       ports.pop();
 
+      // pa ono overwrituje svaki proxy_socket i onda zapravo pravi samo
+      // poslednji umesto svakog
+
       int proxy_socket;
       if (ports.empty()) {
         proxy_server.setPointToIp("127.0.0.1");
@@ -57,11 +60,11 @@ int main(int argc, char *argv[]) {
         proxy_server.setPointToPort(next_port);
 
         proxy_socket = sockets.createProxySocket("127.0.0.1", port);
+        proxy_server.setSocket(proxy_socket);
       }
 
-      proxyThreads.push_back(std::thread([&proxy_server, proxy_socket]() {
-        proxy_server.Start(proxy_socket);
-      }));
+      proxyThreads.push_back(std::thread(
+          [&proxy_server, proxy_socket]() { proxy_server.Start(); }));
     }
 
     for (auto &t : proxyThreads) {

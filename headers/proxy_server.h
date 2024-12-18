@@ -8,16 +8,23 @@
 class ProxyServer {
 public:
   ProxyServer();
-  void Start(int proxySocket);
+  void Start();
+
+  // setters
   void setPointToIp(std::string httpServerIP);
   void setPointToPort(int httpServerPort);
+  void setSocket(int socket);
+
+  // getters
   std::string getPointedToIp();
   int getPointedToPort();
+  int getSocket();
 
 private:
   void HandleConnection(int clientSocket);
   std::string httpServerIP;
   int httpServerPort;
+  int proxy_socket;
 };
 
 #endif

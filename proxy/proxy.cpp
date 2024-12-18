@@ -10,13 +10,15 @@ ProxyServer::ProxyServer() {}
 // setters
 void ProxyServer::setPointToIp(std::string ip) { this->httpServerIP = ip; }
 void ProxyServer::setPointToPort(int port) { this->httpServerPort = port; }
+void ProxyServer::setSocket(int socket) { this->proxy_socket = socket; }
 
 // getters
 std::string ProxyServer::getPointedToIp() { return this->httpServerIP; }
 int ProxyServer::getPointedToPort() { return this->httpServerPort; }
+int ProxyServer::getSocket() { return this->proxy_socket; }
 
-void ProxyServer::Start(int proxy_socket) {
-  if (proxy_socket == -1) {
+void ProxyServer::Start() {
+  if (this->proxy_socket == -1) {
     std::cerr << "Invalid PROXY socket file descriptor!" << std::endl;
     throw std::runtime_error("Invalid PROXY socket fd for listening");
   }
@@ -27,8 +29,8 @@ void ProxyServer::Start(int proxy_socket) {
     sockaddr_in client_address;
     socklen_t client_len = sizeof(client_address);
 
-    int client_socket =
-        accept(proxy_socket, (struct sockaddr *)&client_address, &client_len);
+    int client_socket = accept(this->proxy_socket,
+                               (struct sockaddr *)&client_address, &client_len);
     if (client_socket == -1) {
       std::cerr << "PROXY Server: Failed to accept client connection"
                 << std::endl;
@@ -57,6 +59,10 @@ void ProxyServer::HandleConnection(int clientSocket) {
 
   std::cout << "[Proxy] Connecting to backend server " << httpServerIP
             << " on port " << httpServerPort << std::endl;
+
+  int portPointedTo = getPointedToPort();
+
+  std::cout << "Pointed to port: " << portPointedTo << std::endl;
 
   if (connect(serverSocket, (struct sockaddr *)&serverAddress,
               sizeof(serverAddress)) == -1) {
