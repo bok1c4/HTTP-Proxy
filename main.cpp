@@ -10,7 +10,7 @@
 #include <unordered_set>
 #include <vector>
 
-int main(int argc, char *argv[]) {
+int main() {
   try {
     HttpServer http_server;
     HttpSocket sockets;
