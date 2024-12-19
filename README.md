@@ -1,6 +1,6 @@
 # Multi-Hop Proxy with an Integrated HTTP Server (Anonymous Web Service)
 
-## Phase 1: Basics of HTTP and Proxy Servers
+## Phase 1: Basics of HTTP and Proxy Servers - Completed
 
 ### **1. Basic HTTP Server**
 
@@ -32,7 +32,7 @@
 
 ---
 
-## Phase 2: Advanced Proxy Features
+## Phase 2: Advanced Proxy Features - Completed
 
 ### **3. Multi-Hop Proxy (No Encryption)**
 
@@ -52,7 +52,7 @@ Also we need to have the encryption to have same behaviour as in Tor Network.
 
 ---
 
-### **4. Encryption for Multi-Hop Proxy**
+### **4. Encryption for Multi-Hop Proxy** - Current 
 
 **Goal:** Encrypt traffic between proxy nodes to ensure privacy.
 
