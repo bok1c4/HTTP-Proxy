@@ -13,11 +13,13 @@ public:
   // setters
   void setPointToIp(std::string httpServerIP);
   void setPointToPort(int httpServerPort);
+  void setProxyPort(int port);
   void setSocket(int socket);
 
   // getters
   std::string getPointedToIp();
   int getPointedToPort();
+  int getProxyPort();
   int getSocket();
 
 private:
@@ -25,6 +27,7 @@ private:
   std::string httpServerIP;
   int httpServerPort;
   int proxy_socket;
+  int proxy_port;
 };
 
 #endif

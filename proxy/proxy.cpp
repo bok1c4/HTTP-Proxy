@@ -10,12 +10,15 @@ ProxyServer::ProxyServer() {}
 // setters
 void ProxyServer::setPointToIp(std::string ip) { this->httpServerIP = ip; }
 void ProxyServer::setPointToPort(int port) { this->httpServerPort = port; }
+void ProxyServer::setProxyPort(int port) { this->proxy_port = port; }
+
 void ProxyServer::setSocket(int socket) { this->proxy_socket = socket; }
 
 // getters
 std::string ProxyServer::getPointedToIp() { return this->httpServerIP; }
 int ProxyServer::getPointedToPort() { return this->httpServerPort; }
 int ProxyServer::getSocket() { return this->proxy_socket; }
+int ProxyServer::getProxyPort() { return this->proxy_port; }
 
 void ProxyServer::Start() {
   if (this->proxy_socket == -1) {
@@ -23,7 +26,10 @@ void ProxyServer::Start() {
     throw std::runtime_error("Invalid PROXY socket fd for listening");
   }
 
-  std::cout << "Proxy is running and listening on port..." << std::endl;
+  int listening_port = this->getProxyPort();
+  int points_to = this->getPointedToPort();
+
+  std::cout << "Proxy: " << listening_port << "->" << points_to << std::endl;
 
   while (true) {
     sockaddr_in client_address;
@@ -46,48 +52,46 @@ void ProxyServer::Start() {
 }
 
 void ProxyServer::HandleConnection(int clientSocket) {
-  int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-  if (serverSocket == -1) {
-    std::cerr << "Failed to create server socket!" << std::endl;
+  int points_to = this->getPointedToPort();
+  std::string httpServerIP = this->httpServerIP;
+
+  int outgoingSocket = socket(AF_INET, SOCK_STREAM, 0);
+  if (outgoingSocket == -1) {
+    std::cerr << "[Proxy] Failed to create socket for outgoing connection!"
+              << std::endl;
+    close(clientSocket);
     return;
   }
 
   sockaddr_in serverAddress;
   serverAddress.sin_family = AF_INET;
-  serverAddress.sin_port = htons(httpServerPort);
+  serverAddress.sin_port = htons(points_to);
   inet_pton(AF_INET, httpServerIP.c_str(), &serverAddress.sin_addr);
 
   std::cout << "[Proxy] Connecting to backend server " << httpServerIP
-            << " on port " << httpServerPort << std::endl;
+            << " on port " << points_to << std::endl;
 
-  int portPointedTo = getPointedToPort();
-
-  std::cout << "Pointed to port: " << portPointedTo << std::endl;
-
-  if (connect(serverSocket, (struct sockaddr *)&serverAddress,
+  if (connect(outgoingSocket, (struct sockaddr *)&serverAddress,
               sizeof(serverAddress)) == -1) {
     std::cerr << "[Proxy] Failed to connect to backend server!" << std::endl;
-    close(serverSocket);
+    close(outgoingSocket);
+    close(clientSocket);
     return;
   }
 
   char buffer[4096];
+  while (true) {
+    int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+    if (bytesRead <= 0)
+      break;
+    send(outgoingSocket, buffer, bytesRead, 0);
 
-  // Forward client request to server
-  int bytesRead = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
-  if (bytesRead > 0) {
-    buffer[bytesRead] = '\0';
-    // std::cout << "[Proxy] Request received: " << buffer << std::endl;
-    send(serverSocket, buffer, bytesRead, 0);
-  }
-
-  // Forward server response to client
-  bytesRead = recv(serverSocket, buffer, sizeof(buffer) - 1, 0);
-  if (bytesRead > 0) {
-    buffer[bytesRead] = '\0';
-    // std::cout << "[Proxy] Response received: " << buffer << std::endl;
+    bytesRead = recv(outgoingSocket, buffer, sizeof(buffer), 0);
+    if (bytesRead <= 0)
+      break;
     send(clientSocket, buffer, bytesRead, 0);
   }
 
-  close(serverSocket);
+  close(outgoingSocket);
+  close(clientSocket);
 }
